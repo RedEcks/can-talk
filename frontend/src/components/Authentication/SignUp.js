@@ -1,6 +1,6 @@
 import React, {useState} from "react";
-import {FormControl, FormLabel, VStack, Input, InputGroup, InputRightElement, Button} from "@chakra-ui/react"
-
+import {FormControl, FormLabel, VStack, Input, InputGroup, InputRightElement, Button, Toast, useToast} from "@chakra-ui/react"
+import axios from "axios"
 
 
 function SignUp(){
@@ -10,13 +10,55 @@ function SignUp(){
     const [password, setPassword]= useState()
     const [confirmpassword, setConfirmpassword] = useState()
     const [pic, setPic]= useState()
+    const [loading, setLoading]= useState(false)
+    const toast = useToast()
 
     function handleClick(){
         setsShow(!show)
     }
 
     function postDetails(pics){
-
+        setLoading(true)
+        if (pics===undefined){
+            toast({
+                title: 'Please Select an Image.',
+                description: "Have not selected an image.",
+                status: 'Warning',
+                duration: 5000,
+                isClosable: true,
+              })
+            return
+        }
+        if(pics.type==="image/jpeg" || pics.type==="image/png"){
+            const data = new FormData()
+            data.append("file", pics)
+            data.append("upload_preset", "can-talk")
+            data.append("cloud_name", "dos0ketul")
+            fetch("https://api.cloudinary.com/v1_1/dos0ketul/image/upload",{
+                method: "post",
+                body: data,
+            })
+            .then((res)=> res.json())
+            .then((data)=>{
+                setPic(data.url.toString())
+                setLoading(false)
+            })
+            .catch((err)=>{
+                console.log(err)
+                setLoading(false)
+            }) 
+        }else{
+            toast({
+                title: 'Please Select an Image.',
+                description: "Have not selected an image.",
+                status: 'Warning',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
+            return
+        }
+        
     }
 
     function handleSubmit(){
@@ -84,6 +126,7 @@ function SignUp(){
         width="30%"
         style={{marginTop:15}}
         onClick={handleSubmit}
+        isLoading={loading}
         >
             Sign Up
         </Button>
