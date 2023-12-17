@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {FormControl, FormLabel, VStack, Input, InputGroup, InputRightElement, Button, Toast, useToast} from "@chakra-ui/react"
 import axios from "axios"
+import { useNavigate } from 'react-router-dom'
 
 
 function SignUp(){
@@ -12,6 +13,7 @@ function SignUp(){
     const [pic, setPic]= useState()
     const [loading, setLoading]= useState(false)
     const toast = useToast()
+    const navigate = useNavigate()
 
     function handleClick(){
         setsShow(!show)
@@ -61,8 +63,60 @@ function SignUp(){
         
     }
 
-    function handleSubmit(){
-
+    const handleSubmit= async()=>{
+        setLoading(true)
+        if(!name || !email || !password || !confirmpassword){
+            toast({
+                title: 'Please fill all the feilds.',
+                description: "Have not filled in all the feilds.",
+                status: 'Warning',
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
+            return
+        }
+        if(password !== confirmpassword){
+            toast({
+                title: 'Passwords do not match.',
+                description: "Passwords do not match.",
+                status: 'Warning',
+                duration: 5000,
+                isClosable: true,
+            })
+            return
+        }
+        try {
+            const config= {
+                headers:{
+                    "Content-type": "application/json",
+                }
+            }
+            const{ data } = await axios.post(
+                "/api/user",
+                {name,email, password,pic}, 
+                config
+                )
+                toast({
+                    title: 'Registration Successful.',
+                    description: "success.",
+                    status: 'success',
+                    duration: 5000,
+                    isClosable: true,
+                })
+                localStorage.setItem('userInfo', JSON.stringify(data))
+                setLoading(false)
+                navigate('/chats')
+        } catch(error){
+            toast({
+                title: 'Error Occured!',
+                description: error.response.data.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            })
+            setLoading(false)
+        }
     }
 
     return(
