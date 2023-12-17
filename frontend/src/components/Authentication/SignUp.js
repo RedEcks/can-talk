@@ -67,8 +67,8 @@ function SignUp(){
         setLoading(true)
         if(!name || !email || !password || !confirmpassword){
             toast({
-                title: 'Please fill all the feilds.',
-                description: "Have not filled in all the feilds.",
+                title: 'Please fill all the fields.',
+                description: "Have not filled in all the fields.",
                 status: 'Warning',
                 duration: 5000,
                 isClosable: true,
